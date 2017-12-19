@@ -109,3 +109,15 @@ teardown(){
 
   [[ $status -eq 6 ]]
 }
+
+@test "Array_hasValue true" {
+  run Array_hasValue test_array "item1"
+
+  [[ $status -eq 0 ]]
+}
+
+@test "Array_hasValue false" {
+  run Array_hasValue test_array "randomvalue"
+
+  [[ $status -gt 0 ]]
+}

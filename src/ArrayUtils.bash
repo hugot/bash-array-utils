@@ -169,3 +169,20 @@ Array_yield(){
   $in_Array_map && oth_array=("${oth_array[@]}" "$@")
 }
 
+##
+# Check if an array has a certain value stored in it.
+# $1: arrayname
+# $2: value
+Array_hasValue() {
+  if ! Array_isValid "$1"; then
+    echo "$(caller): $1 is not a valid array."
+    exit 1
+  fi
+
+  declare -n array="$1"
+
+  for item in "${array[@]}"; do
+    [[ "$2" == "$item" ]] && return 0
+  done
+  return 1
+}
