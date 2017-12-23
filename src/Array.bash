@@ -37,8 +37,7 @@ function Array_varIsValid() {
     echo 'Array: Variable needs to be declared before assigning to it.' >&2
     return 3
   elif [[ $1 == variable ]]; then
-    echo 'Array: Variable cannot be named "variable"' &
-    2
+    echo 'Array: Variable cannot be named "variable"' >&2
     return 5
   fi
 }
