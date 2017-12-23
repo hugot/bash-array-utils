@@ -15,7 +15,7 @@
 # 2: The array variable is named "array"
 #
 # $1: array_name
-Array_isValid(){
+function Array_isValid() {
   if ! declare -p "$1" &>>/dev/null; then
     echo 'Array: Array variable needs to be set.' >&2
     return 1
@@ -32,12 +32,13 @@ Array_isValid(){
 # 5: The variable is named "variable"
 #
 # $1 variable_name
-Array_varIsValid(){
+function Array_varIsValid() {
   if ! [[ -v $1 ]]; then
     echo 'Array: Variable needs to be declared before assigning to it.' >&2
     return 3
   elif [[ $1 == variable ]]; then
-    echo 'Array: Variable cannot be named "variable"' &2
+    echo 'Array: Variable cannot be named "variable"' &
+    2
     return 5
   fi
 }
@@ -49,7 +50,7 @@ Array_varIsValid(){
 # other: see Array_isValid
 #
 # $1: array_name
-Array_pop(){
+function Array_pop() {
   Array_isValid "$1" || return $?
 
   declare -n array="$1"
@@ -57,7 +58,6 @@ Array_pop(){
 
   unset 'array[-1]'
 }
-
 
 ##
 # Pop an array and assign the popped value to a variable
@@ -67,7 +67,7 @@ Array_pop(){
 #
 # $1: array_name
 # $2: variable_name
-Array_popToVar(){
+function Array_popToVar() {
   Array_isValid "$1" || return $?
   Array_varIsValid "$2" || return $?
 
@@ -81,12 +81,12 @@ Array_popToVar(){
 ##
 # Shift an array.
 # $1: array_name
-Array_shift(){
+function Array_shift() {
   Array_isValid "$1" || return $?
 
   declare -n array="$1"
   declare -i shift_amount="$2"
-  let 'shift_amount = shift_amount == 0 ? ++shift_amount : shift_amount'
+  ((shift_amount = shift_amount == 0 ? ++shift_amount : shift_amount))
   [[ ${#array[@]} -gt 0 ]] || return 4
   set -- "${array[@]}"
   shift $shift_amount
@@ -95,13 +95,13 @@ Array_shift(){
 }
 
 ##
-# Shift an array and assign the shifted value to a variable 
+# Shift an array and assign the shifted value to a variable
 # $1: array_name
 # $2: variable_name
-Array_shiftToVar(){
+function Array_shiftToVar() {
   Array_isValid "$1" || return $?
   Array_varIsValid "$2" || return $?
-  
+
   # TODO: Add shifting to multiple variables
   declare -n array="$1" variable="$2"
   [[ ${#array[@]} -gt 0 ]] || return 4
@@ -114,11 +114,11 @@ Array_shiftToVar(){
 # Push a value to an array
 # $1: array_name
 # $2: value
-Array_push(){
+function Array_push() {
   Array_isValid "$1" || return $?
   declare -n array="$1"
   shift
-  
+
   array=("${array[@]}" "$@")
 }
 
@@ -126,7 +126,7 @@ Array_push(){
 # Unshift a value to an array
 # $1: array_name
 # $*: values
-Array_unshift(){
+function Array_unshift() {
   Array_isValid "$1" || return $?
   declare -n array="$1"
   shift
@@ -140,7 +140,7 @@ Array_unshift(){
 # $1: array_name
 # $2: array_to_be_assigned_to_name (may not be "oth_array")
 # $3: callback_name
-Array_map(){
+function Array_map() {
   if ! declare -F "$3" &>>/dev/null; then
     echo 'Array: Error, $3 for Array_map must be a function name'
     return 6
@@ -161,11 +161,10 @@ Array_map(){
   array=("${oth_array[@]}")
 }
 
-
 ##
 # Strictly for use in Array_map callbacks.
 # $1: Variable that should be added to the new array
-Array_yield(){
+function Array_yield() {
   $in_Array_map && oth_array=("${oth_array[@]}" "$@")
 }
 
@@ -173,7 +172,7 @@ Array_yield(){
 # Check if an array has a certain value stored in it.
 # $1: arrayname
 # $2: value
-Array_hasValue() {
+function Array_hasValue() {
   if ! Array_isValid "$1"; then
     echo "$(caller): $1 is not a valid array."
     exit 1
