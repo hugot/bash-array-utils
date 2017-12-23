@@ -1,5 +1,5 @@
 
-source src/ArrayUtils.bash
+source src/Array.bash
 
 setup(){
   declare -ga test_array=(item1 item2 item3)

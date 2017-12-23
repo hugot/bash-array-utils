@@ -27,7 +27,7 @@ function Array_isValid() {
 
 ##
 # Check if a variable can be assigned.
-# return values"
+# return values:
 # 3: The variable has not yet been declared
 # 5: The variable is named "variable"
 #
@@ -170,6 +170,7 @@ function Array_yield() {
 
 ##
 # Check if an array has a certain value stored in it.
+# TODO: make this work with non-string values as well.
 # $1: arrayname
 # $2: value
 function Array_hasValue() {
