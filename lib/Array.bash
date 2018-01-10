@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Author: Hugo Thunnissen <hugo.thunnissen@gmail.com>
+# License: see LICENSE file.
+#
 ##
 # Utility functions for common array operations.
 # To prevent circular references, none of the functions allow
@@ -6,6 +10,7 @@
 # of an array by the name "oth_array" for a second arrayname that is passed.
 # Functions that do variable assignment won't allow the usage of a variable
 # by the name "variable".
+#
 ##
 
 ##
@@ -15,7 +20,7 @@
 # 2: The array variable is named "array"
 #
 # $1: array_name
-function Array_isValid() {
+function Array::isValid() {
   if ! declare -p "$1" &>>/dev/null; then
     echo 'Array: Array variable needs to be set.' >&2
     return 1
@@ -32,7 +37,7 @@ function Array_isValid() {
 # 5: The variable is named "variable"
 #
 # $1 variable_name
-function Array_varIsValid() {
+function Array::varIsValid() {
   if ! [[ -v $1 ]]; then
     echo 'Array: Variable needs to be declared before assigning to it.' >&2
     return 3
@@ -46,11 +51,11 @@ function Array_varIsValid() {
 # pop an array
 # return values:
 # 4: array size is 0
-# other: see Array_isValid
+# other: see Array::isValid
 #
 # $1: array_name
-function Array_pop() {
-  Array_isValid "$1" || return $?
+function Array::pop() {
+  Array::isValid "$1" || return $?
 
   declare -n array="$1"
   [[ ${#array[@]} -gt 0 ]] || return 4
@@ -62,26 +67,26 @@ function Array_pop() {
 # Pop an array and assign the popped value to a variable
 # return values:
 # 4: array size is 0
-# other: see Array_isValid and Array_varIsValid
+# other: see Array::isValid and Array::varIsValid
 #
 # $1: array_name
 # $2: variable_name
-function Array_popToVar() {
-  Array_isValid "$1" || return $?
-  Array_varIsValid "$2" || return $?
+function Array::popToVar() {
+  Array::isValid "$1" || return $?
+  Array::varIsValid "$2" || return $?
 
   declare -n array="$1" variable="$2"
   [[ ${#array[@]} -gt 0 ]] || return 4
   variable="${array[-1]}"
 
-  Array_pop "$1"
+  Array::pop "$1"
 }
 
 ##
 # Shift an array.
 # $1: array_name
-function Array_shift() {
-  Array_isValid "$1" || return $?
+function Array::shift() {
+  Array::isValid "$1" || return $?
 
   declare -n array="$1"
   declare -i shift_amount="$2"
@@ -97,24 +102,24 @@ function Array_shift() {
 # Shift an array and assign the shifted value to a variable
 # $1: array_name
 # $2: variable_name
-function Array_shiftToVar() {
-  Array_isValid "$1" || return $?
-  Array_varIsValid "$2" || return $?
+function Array::shiftToVar() {
+  Array::isValid "$1" || return $?
+  Array::varIsValid "$2" || return $?
 
   # TODO: Add shifting to multiple variables
   declare -n array="$1" variable="$2"
   [[ ${#array[@]} -gt 0 ]] || return 4
   variable="${array[0]}"
 
-  Array_shift "$1"
+  Array::shift "$1"
 }
 
 ##
 # Push a value to an array
 # $1: array_name
 # $2: value
-function Array_push() {
-  Array_isValid "$1" || return $?
+function Array::push() {
+  Array::isValid "$1" || return $?
   declare -n array="$1"
   shift
 
@@ -125,8 +130,8 @@ function Array_push() {
 # Unshift a value to an array
 # $1: array_name
 # $*: values
-function Array_unshift() {
-  Array_isValid "$1" || return $?
+function Array::unshift() {
+  Array::isValid "$1" || return $?
   declare -n array="$1"
   shift
 
@@ -139,13 +144,13 @@ function Array_unshift() {
 # $1: array_name
 # $2: array_to_be_assigned_to_name (may not be "oth_array")
 # $3: callback_name
-function Array_map() {
+function Array::map() {
   if ! declare -F "$3" &>>/dev/null; then
-    echo 'Array: Error, $3 for Array_map must be a function name'
+    echo 'Array: Error, $3 for Array::map must be a function name'
     return 6
   fi
-  Array_isValid "$1" || return $?
-  Array_isValid "$2" || return $?
+  Array::isValid "$1" || return $?
+  Array::isValid "$2" || return $?
 
   declare -n array="$1"
   declare -a oth_array=()
@@ -161,27 +166,32 @@ function Array_map() {
 }
 
 ##
-# Strictly for use in Array_map callbacks.
+# Strictly for use in Array::map callbacks.
 # $1: Variable that should be added to the new array
-function Array_yield() {
-  $in_Array_map && oth_array=("${oth_array[@]}" "$@")
+function Array::yield() {
+  [[ "$in_Array_map"  == true ]] && oth_array=("${oth_array[@]}" "$@")
 }
 
 ##
 # Check if an array has a certain value stored in it.
-# TODO: make this work with non-string values as well.
 # $1: arrayname
 # $2: value
-function Array_hasValue() {
-  if ! Array_isValid "$1"; then
+function Array::hasValue() {
+  if ! Array::isValid "$1"; then
     echo "$(caller): $1 is not a valid array."
     exit 1
   fi
 
   declare -n array="$1"
 
-  for item in "${array[@]}"; do
-    [[ "$2" == "$item" ]] && return 0
-  done
+  if [[ $2 == +([0-9]) ]]; then
+    for item in "${array[@]}"; do
+      [[ $2 -eq $item ]] && return 0
+    done
+  else
+    for item in "${array[@]}"; do
+      [[ "$2" == "$item" ]] && return 0
+    done
+  fi
   return 1
 }

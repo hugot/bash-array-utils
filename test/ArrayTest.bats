@@ -1,123 +1,139 @@
 
-source src/Array.bash
+source lib/Array.bash
 
-setup(){
+function setup () {
   declare -ga test_array=(item1 item2 item3)
 }
 
-teardown(){
+teardown () {
   declare -ga test_array=()
 }
 
-@test "Array_pop" {
+@test "Array::pop" {
   declare -a expected=(item1 item2)
-  Array_pop test_array
+  Array::pop test_array
 
   [[ ${expected[@]} == ${test_array[@]} ]]
 }
 
-@test "Array_pop empty array" {
+@test "Array::pop empty array" {
   declare -a test_array=()
-  run Array_pop test_array
+  run Array::pop test_array
 
   [[ $status -eq 4 ]]
 }
 
-@test "Array_popToVar" {
+@test "Array::popToVar" {
   declare expected="${test_array[-1]}"
   declare var=''
   echo $expected $var
-  Array_popToVar test_array var
+  Array::popToVar test_array var
 
   [[ $expected == $var ]]
 }
 
-@test "Array_shift" {
-  Array_shift test_array
+@test "Array::shift" {
+  Array::shift test_array
   declare -a expected=(item2 item3)
 
   [[ ${expected[@]} ==  ${test_array[@]} ]]
 }
 
-@test "Array_shiftToVar" {
+@test "Array::shiftToVar" {
   declare var='' expected="${test_array[0]}"
-  Array_shiftToVar test_array var
+  Array::shiftToVar test_array var
 
   [[ $expected == $var ]]
 }
 
-@test "Array_push" {
+@test "Array::push" {
   declare -a expected=("${test_array[@]}" "item4")
-  Array_push test_array "item4"
+  Array::push test_array "item4"
 
   [[ ${expected[@]} ==  ${test_array[@]} ]]
 }
 
-@test "Array_push multiple values" {
+@test "Array::push multiple values" {
   declare -a expected=("${test_array[@]}" "item4" "item5")
-  Array_push test_array "item4" "item5"
+  Array::push test_array "item4" "item5"
 
   [[ ${expected[@]} ==  ${test_array[@]} ]]
 }
 
-@test "Array_unshift" {
+@test "Array::unshift" {
   declare -a expected=("item0" "${test_array[@]}")
-  Array_unshift test_array "item0"
+  Array::unshift test_array "item0"
 
   [[ ${expected[@]} ==  ${test_array[@]} ]]
 }
 
-@test "Array_unshift multiple values" {
+@test "Array::unshift multiple values" {
   declare -a expected=("item-1" "item0" "${test_array[@]}")
-  Array_unshift test_array "item-1" "item0"
+  Array::unshift test_array "item-1" "item0"
 
   [[ ${expected[@]} ==  ${test_array[@]} ]]
 }
 
-@test "Array_yield" {
+@test "Array::yield" {
   declare -a oth_array=() expected=(item1)
   declare in_Array_map="true"
-  Array_yield item1
+  Array::yield item1
 
   [[ ${expected[@]} ==  ${oth_array[@]} ]]
 }
 
-@test "Array_yield not in Array_map" {
+@test "Array::yield not in Array::map" {
   declare -a oth_array=() expected=()
   declare in_Array_map="false"
-  run Array_yield item1
+  run Array::yield item1
 
   [[ ${expected[@]} ==  ${oth_array[@]} ]]
 }
 
-@test "Array_map" {
+@test "Array::map" {
   declare -a new_array=()
   declare -a expected=(item1 item3)
   function example {
     case $1 in item1|item3)
-        Array_yield "$1"
+        Array::yield "$1"
     esac
   }
-  Array_map test_array new_array example
+  Array::map test_array new_array example
   unset -f example
 
   [[ ${expected[@]} ==  ${new_array[@]} ]]
 }
 
-@test "Array_map no callback" {
-  run Array_map randomFuncName
+@test "Array::map no callback" {
+  run Array::map randomFuncName
 
   [[ $status -eq 6 ]]
 }
 
-@test "Array_hasValue true" {
-  run Array_hasValue test_array "item1"
+@test "Array::hasValue true" {
+  run Array::hasValue test_array "item1"
 
   [[ $status -eq 0 ]]
 }
 
-@test "Array_hasValue false" {
-  run Array_hasValue test_array "randomvalue"
+@test "Array::hasValue false" {
+  run Array::hasValue test_array "randomvalue"
 
   [[ $status -gt 0 ]]
 }
+
+@test "Array::hasValue (integer) true" {
+  declare int_array=(1 2 3 4)
+  run Array::hasValue int_array 1
+
+  [[ $status -eq 0 ]]
+}
+
+@test "Array::hasValue (integer) false" {
+  declare int_array=(1 2 3 4)
+  run Array::hasValue int_array 9
+
+  [[ $status -gt 0 ]]
+}
+
+
