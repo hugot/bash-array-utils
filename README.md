@@ -24,11 +24,13 @@ on the return values, please refer to the comments in Array.bash.
 
 ## Installation
 Installation is fairly straight forward. The lib has no dependencies except for bash itself. You can simply clone the
-repo and start using the lib:
+repo and start using the lib:  
+  
 `git clone https://github.com/redrock9/bash-array-utils`
 
 You could also use [basher](https://github.com/basherpm/basher) to install the lib and source the file with its recently added
-`include` function:
+`include` function:  
+  
 `basher install redrock9/bash-array-utils`
 
 ### Usage with bashers include function:
