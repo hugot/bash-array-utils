@@ -1,7 +1,7 @@
 
 source lib/Array.bash
 
-function setup () {
+setup () {
   declare -ga test_array=(item1 item2 item3)
 }
 
@@ -136,27 +136,48 @@ teardown () {
   [[ $status -gt 0 ]]
 }
 
-@test "Array::indexToVar found" {
-  declare var=
+@test "Array::indexToVar found (var)" {
+  declare -i var=
   Array::indexToVar test_array item1 var
 
-  [[ $var == 0 ]]
+  (( var == 0 ))
+}
+
+@test "Array::indexToVar found (return)" {
+  declare -i var=
+  run Array::indexToVar test_array item1 var
+
+  [[ $status == 0 ]]
+}
+
+@test "Array::indexToVar not found (var)" {
+  declare -i var=
+  Array::indexToVar test_array item4 var || true
+
+  (( var == -1 ))
+}
+
+@test "Array::indexToVar not found (return)" {
+  declare -i var=
+  run Array::indexToVar test_array item4 var
+
+  [[ $status == 1 ]]
 }
 
 @test "Array::indexToVar first occurrence" {
   declare -a my_array=(hello world world)
-  declare var=
+  declare -i var=
   Array::indexToVar my_array world var
 
-  [[ $var == 1 ]]
+  (( var == 1 ))
 }
 
 @test "Array::indexToVar holes" {
   declare -a my_array=(hello world world)
-  declare var=
+  declare -i var=
   Array::indexToVar my_array world var
   unset my_array[$var]
   Array::indexToVar my_array world var
 
-  [[ $var == 2 ]]
+  (( var == 2 ))
 }
