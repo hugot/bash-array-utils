@@ -184,7 +184,7 @@ function Array::hasValue() {
 
   declare -n array="$1"
 
-  if [[ $2 == +([0-9]) ]]; then
+  if [[ "$(declare -p int_array)" == 'declare -ai'* ]]; then
     for item in "${array[@]}"; do
       [[ $2 -eq $item ]] && return 0
     done
