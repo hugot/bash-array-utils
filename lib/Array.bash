@@ -177,10 +177,7 @@ function Array::yield() {
 # $1: arrayname
 # $2: value
 function Array::hasValue() {
-  if ! Array::isValid "$1"; then
-    echo "$(caller): $1 is not a valid array."
-    exit 1
-  fi
+  Array::isValid "$1" || return $?
 
   declare -n array="$1"
 
