@@ -195,3 +195,27 @@ function Array::hasValue() {
   fi
   return 1
 }
+
+##
+# Assign the index of a given element to a given variable.
+# If the element is not found, assign -1 to the variable, and return 1.
+# $1: array_name
+# $2: element
+# $3: variable_name
+function Array::indexToVar() {
+  Array::isValid "$1" || return $?
+  Array::varIsValid "$3" || return $?
+
+  declare -n array="$1"
+  declare -n variable="$3"
+
+  for i in "${!array[@]}"; do
+    if [[ "$2" == "${array[$i]}" ]]; then
+      variable=$i
+      return 0
+    fi
+  done
+
+  variable=-1
+  return 1
+}
