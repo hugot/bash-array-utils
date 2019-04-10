@@ -123,17 +123,15 @@ teardown () {
 }
 
 @test "Array::hasValue (integer) true" {
-  declare int_array=(1 2 3 4)
+  declare -ia int_array=(1 2 3 4)
   run Array::hasValue int_array 1
 
   [[ $status -eq 0 ]]
 }
 
 @test "Array::hasValue (integer) false" {
-  declare int_array=(1 2 3 4)
+  declare -ia int_array=(1 2 3 4)
   run Array::hasValue int_array 9
 
   [[ $status -gt 0 ]]
 }
-
-
